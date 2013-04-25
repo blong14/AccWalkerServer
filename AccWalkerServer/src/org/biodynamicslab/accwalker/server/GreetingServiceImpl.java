@@ -28,18 +28,9 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 
 		String serverInfo = getServletContext().getServerInfo();
 		String userAgent = getThreadLocalRequest().getHeader("User-Agent");
-		
-
+	
 		PersistenceManager pm = getPersistenceManager();
-	    
-		try {
-			
-			pm.makePersistent( new Walker( input ) );
-			
-		} finally {
-			pm.close();
-		}
-
+	
 		// Escape data from the client to avoid cross-site script vulnerabilities.
 		input = escapeHtml(input);
 		userAgent = escapeHtml(userAgent);

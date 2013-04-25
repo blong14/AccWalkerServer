@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <!-- Servlets -->
+   <servlet>
+    <servlet-name>DataParser</servlet-name>
+    <servlet-class>org.biodynamicslab.accwalker.server.DataParser</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>DataParser</servlet-name>
+    <url-pattern>/accwalkerserver/data</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <servlet-name>greetServlet</servlet-name>
     <servlet-class>org.biodynamicslab.accwalker.server.GreetingServiceImpl</servlet-class>

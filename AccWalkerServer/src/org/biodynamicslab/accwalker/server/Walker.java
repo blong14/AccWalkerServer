@@ -9,7 +9,7 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable( identityType = IdentityType.APPLICATION )
 public class Walker {
 	
-	/**The item id*/
+	/**The Walker id*/
 	@PrimaryKey
 	@Persistent( valueStrategy = IdGeneratorStrategy.IDENTITY )
 	private Long id;
@@ -18,9 +18,19 @@ public class Walker {
 	@Persistent
 	private String trial;
 	
-	public Walker( String trial ){
+	/**The amount of time for the data collection*/
+	@Persistent
+	private int time;
+	
+	/**The data in the Z axis*/
+	@Persistent
+	private Float[] DataZ;
+	
+	public Walker( String trial, int time, Float[] DataZ ){
 		
-		this.setTrial(trial);
+		this.trial= trial;
+		this.time= time;
+		this.DataZ= DataZ;
 	}
 
 	public Long getId() {
@@ -34,5 +44,12 @@ public class Walker {
 	public void setTrial(String trial) {
 		this.trial = trial;
 	}
-
+	
+	public int getTime(){
+		return time;
+	}
+	
+	public Float[] getDataZ(){
+		return DataZ;
+	}
 }
