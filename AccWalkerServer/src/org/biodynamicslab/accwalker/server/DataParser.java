@@ -2,7 +2,6 @@ package org.biodynamicslab.accwalker.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
@@ -86,15 +85,13 @@ public class DataParser extends HttpServlet {
 	private void parseData( String data ){
 		
 		//Here we use GSON to decode JSON encoded data from the client
-		@SuppressWarnings("rawtypes")
-		Map jsonData = new Gson().fromJson( data, Map.class );
-		Double time= (Double) jsonData.get( "time" );
-		Float[] DataZ= (Float[]) jsonData.get( "DataZ" );
-
+		Gson gson= new Gson();
+		Walker mWalker= gson.fromJson( data, Walker.class );
+		
 		//Now that data is decoded, we can push the persistent manager to handle storing the data
 		//as a Walker object on the server
 		PersistenceManager pm= getPersistenceManager();
-		pm.makePersistent( new Walker( ( String )jsonData.get( "trial" ), time.intValue()/1000, DataZ ) );
+		pm.makePersistent( mWalker );
 		pm.close();
 	}
 }

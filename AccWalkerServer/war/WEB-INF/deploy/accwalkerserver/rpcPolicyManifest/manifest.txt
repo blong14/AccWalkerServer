@@ -1,3 +1,2 @@
 # Module accwalkerserver
 # RPC service class, partial path of RPC policy file
-org.biodynamicslab.accwalker.client.GreetingService, 9E54809064ADB4AAEDCD1BDEFDED175C.gwt.rpc

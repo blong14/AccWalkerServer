@@ -24,9 +24,9 @@ public class Walker {
 	
 	/**The data in the Z axis*/
 	@Persistent
-	private Float[] DataZ;
+	private float[] DataZ;
 	
-	public Walker( String trial, int time, Float[] DataZ ){
+	public Walker( String trial, int time, float[] DataZ ){
 		
 		this.trial= trial;
 		this.time= time;
@@ -49,7 +49,7 @@ public class Walker {
 		return time;
 	}
 	
-	public Float[] getDataZ(){
+	public float[] getDataZ(){
 		return DataZ;
 	}
 }

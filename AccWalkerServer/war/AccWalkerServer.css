@@ -1,34 +1,33 @@
 /** Add css rules here for your application. */
 
-
-/** Example rules used by the template application (remove for your app) */
-h1 {
-  font-size: 2em;
-  font-weight: bold;
-  color: #777777;
-  margin: 40px 0px 70px;
+body {
+  padding: 10px;
   text-align: center;
 }
 
-.sendButton {
-  display: block;
-  font-size: 16pt;
+.mainPanel {
+	margin: auto;
 }
 
-/** Most GWT widgets already have a style name defined */
-.gwt-DialogBox {
-  width: 400px;
+/* list flex table */
+.itemList {
+  border: 1px solid silver;
+  padding: 2px;
+  margin-bottom:6px;
 }
 
-.dialogVPanel {
-  margin: 5px;
+/*List Remove column */
+.listRemoveColumn {
+  text-align: center;
 }
 
-.serverResponseLabelError {
-  color: red;
+/* Add item panel */
+.addPanel {
+  /*margin: 10px 0px 15px 0px;*/
+  margin: auto;
 }
 
-/** Set ids using widget.getElement().setId("idOfElement") */
-#closeButton {
-  margin: 15px 6px 6px;
+/* item list, the Remove button */
+.gwt-Button-remove {
+  width: 50px;
 }

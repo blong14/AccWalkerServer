@@ -1,18 +1,17 @@
 package org.biodynamicslab.accwalker.client;
 
-import org.biodynamicslab.accwalker.shared.FieldVerifier;
+import java.util.ArrayList;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -20,133 +19,176 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class AccWalkerServer implements EntryPoint {
+public class AccWalkerServer implements EntryPoint, ClickHandler, KeyPressHandler {
+	
+	/**The mainPanel to hold the UI elements*/
+	private VerticalPanel mainPanel = new VerticalPanel();
+	
+	/**The flexTable to display the list items*/
+	private FlexTable listFlexTable = new FlexTable();
+	
+	/**The processPanel to add items to the list*/
+	private HorizontalPanel analyzePanel = new HorizontalPanel();
+	
+	/**The trial text to display to the user*/
+	private TextBox trialText = new TextBox();
+	
+	/**The add item button to add items to the list*/
+	private Button btnAnalyzeWalker = new Button( "Analyze" );
+	
+	/**The list of trials*/
+	private ArrayList<String> mTrials;
+	
+	/**The list item service to talk to the server*/
+	private GreetingServiceAsync greetSvc = GWT.create( GreetingService.class );
+	
 	/**
-	 * The message displayed to the user when the server cannot be reached or
-	 * returns an error.
-	 */
-	private static final String SERVER_ERROR = "An error occurred while "
-			+ "attempting to contact the server. Please check your network "
-			+ "connection and try again.";
-
-	/**
-	 * Create a remote service proxy to talk to the server-side Greeting service.
-	 */
-	private final GreetingServiceAsync greetingService = GWT
-			.create(GreetingService.class);
-
-	/**
-	 * This is the entry point method.
+	 * Entry point method.
 	 */
 	public void onModuleLoad() {
-		final Button sendButton = new Button("Send");
-		final TextBox nameField = new TextBox();
-		nameField.setText("GWT User");
-		final Label errorLabel = new Label();
+		
+		//First, Create table for the list data.
+		listFlexTable.setText( 0, 0, "Trial Info:" );
+	    
+	    // Add styles to elements in the stock list table.
+	    listFlexTable.addStyleName( "itemList" );
+	    listFlexTable.setCellPadding( 6 );
+	    listFlexTable.getCellFormatter().addStyleName( 0, 3, "listRemoveColumn" );
+	
+	    // Assemble Add Item panel.
+	    analyzePanel.add( trialText );
+	    analyzePanel.add( btnAnalyzeWalker );
+	    analyzePanel.addStyleName( "addPanel" );
 
-		// We can add style names to widgets
-		sendButton.addStyleName("sendButton");
+	    // Assemble Main panel.
+	    mainPanel.add( listFlexTable );
+	    mainPanel.add( analyzePanel );
+	    mainPanel.addStyleName( "mainPanel" );
+	    
+	    // Associate the Main panel with the HTML host page.
+	    RootPanel.get( "accwalkerServer" ).add( mainPanel );
+	    
+	    // Move cursor focus to the input box.
+	    trialText.setFocus( true );
+	    
+	    //Get the list from the server and set up the ArrayList to hold the data
+	    mTrials= new ArrayList<String>();
+	    getList();
+	    
+	    btnAnalyzeWalker.addClickHandler( this );
+	    
+	    trialText.addKeyPressHandler( this );
+	}
+	
+	/**
+	 * The onClick method handles user interaction from the mouse
+	 * 
+	 * @param the event that was fired
+	 */
+	@Override
+	public void onClick( ClickEvent event ) {
 
-		// Add the nameField and sendButton to the RootPanel
-		// Use RootPanel.get() to get the entire body element
-		RootPanel.get("nameFieldContainer").add(nameField);
-		RootPanel.get("sendButtonContainer").add(sendButton);
-		RootPanel.get("errorLabelContainer").add(errorLabel);
+	}
+	
+	/**
+	 * The onKeyPress method handles events from the key board
+	 * 
+	 * @param the key that was pressed by the user
+	 */
+	@Override
+	public void onKeyPress( KeyPressEvent event ){
+		
+	}
+	
+  /**
+   * Add items to FlexTable. Executed when the user clicks the addItemButton or
+   * presses enter in the itemText.
+   */
+	private void addToTable( final String trial, final int trialIndex ) {
+	
+		  // Add the item to the table.
+		  int row = listFlexTable.getRowCount();
+		  listFlexTable.setText( row, 0, trial );
+		  listFlexTable.getCellFormatter().addStyleName( row, 3, "listRemoveColumn" );
+		  
+		  trialText.setFocus( true );
+		  trialText.setText( "" );
 
-		// Focus the cursor on the name field when the app loads
-		nameField.setFocus(true);
-		nameField.selectAll();
+		  //Create remove buttons dynamically
+		  Button btnRemoveTrial = new Button( "x" );
+		  btnRemoveTrial.addClickHandler(new ClickHandler( ) {
+			 
+			  public void onClick( ClickEvent event ) {
+				  
+				  int removedIndex = mTrials.indexOf(trial);
+				  removeFromList( trial );
+				  mTrials.remove( removedIndex );
+			      listFlexTable.removeRow( trialIndex + 1 );
+			  }
+		  });
+		  
+		  listFlexTable.setWidget(row, 3, btnRemoveTrial );
+	  }
 
-		// Create the popup dialog box
-		final DialogBox dialogBox = new DialogBox();
-		dialogBox.setText("Remote Procedure Call");
-		dialogBox.setAnimationEnabled(true);
-		final Button closeButton = new Button("Close");
-		// We can set the id of a widget by accessing its Element
-		closeButton.getElement().setId("closeButton");
-		final Label textToServerLabel = new Label();
-		final HTML serverResponseLabel = new HTML();
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-		dialogVPanel.add(textToServerLabel);
-		dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-		dialogVPanel.add(serverResponseLabel);
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-		dialogVPanel.add(closeButton);
-		dialogBox.setWidget(dialogVPanel);
+	/**
+	 * The getList method retrieves the list off the server
+	 */
+	private void getList() {
+		
+		  // Initialize the service proxy.
+		  if ( greetSvc == null ) {
+			  greetSvc = GWT.create( GreetingService.class );
+		  }
 
-		// Add a handler to close the DialogBox
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				dialogBox.hide();
-				sendButton.setEnabled(true);
-				sendButton.setFocus(true);
-			}
-		});
+		  // Set up the callback objects
+		  AsyncCallback<String[]> callback = new AsyncCallback<String[]>() {
+	    
+			  public void onFailure(Throwable caught) {
+				  System.err.println( caught );
+			  }
 
-		// Create a handler for the sendButton and nameField
-		class MyHandler implements ClickHandler, KeyUpHandler {
-			/**
-			 * Fired when the user clicks on the sendButton.
-			 */
-			public void onClick(ClickEvent event) {
-				sendNameToServer();
-			}
+			  public void onSuccess( String[] result ) {
+				  
+				  for( int i= 0; i < result.length; i++ ){
+					  
+					  mTrials.add( result[i] );
+					  int itemIndex= mTrials.indexOf( result[i] );
+					  
+					  addToTable( result[i], itemIndex );
+				  }
+			  }
+		  };
+		  
+		  // Make the call to the stock price service.
+		  greetSvc.getList( callback );
+	}
+	
+	/**
+	 * The removeItem method handles removing list items from the server 
+	 */
+	@SuppressWarnings("rawtypes")
+	private void removeFromList( String item ){
+		
+		  // Initialize the service proxy.
+		  if ( greetSvc == null ) {
+			  greetSvc = GWT.create( GreetingService.class );
+		  }
 
-			/**
-			 * Fired when the user types in the nameField.
-			 */
-			public void onKeyUp(KeyUpEvent event) {
-				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					sendNameToServer();
-				}
-			}
+		  // Set up the callback objects
+		  AsyncCallback callback = new AsyncCallback() {
+	    
+			  public void onFailure(Throwable caught) {
+	        
+				  // TODO: Do something with errors
+			  }
 
-			/**
-			 * Send the name from the nameField to the server and wait for a response.
-			 */
-			private void sendNameToServer() {
-				// First, we validate the input.
-				errorLabel.setText("");
-				String textToServer = nameField.getText();
-				if (!FieldVerifier.isValidName(textToServer)) {
-					errorLabel.setText("Please enter at least four characters");
-					return;
-				}
-
-				// Then, we send the input to the server.
-				sendButton.setEnabled(false);
-				textToServerLabel.setText(textToServer);
-				serverResponseLabel.setText("");
-				greetingService.greetServer(textToServer,
-						new AsyncCallback<String>() {
-							public void onFailure(Throwable caught) {
-								// Show the RPC error message to the user
-								dialogBox
-										.setText("Remote Procedure Call - Failure");
-								serverResponseLabel
-										.addStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(SERVER_ERROR);
-								dialogBox.center();
-								closeButton.setFocus(true);
-							}
-
-							public void onSuccess(String result) {
-								dialogBox.setText("Remote Procedure Call");
-								serverResponseLabel
-										.removeStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(result);
-								dialogBox.center();
-								closeButton.setFocus(true);
-							}
-						});
-			}
-		}
-
-		// Add a handler to send the name to the server
-		MyHandler handler = new MyHandler();
-		sendButton.addClickHandler(handler);
-		nameField.addKeyUpHandler(handler);
+			  public void onSuccess( Object result ) {
+				  
+				  //TODO: Do something with success
+			  }
+		  };
+		  
+		  // Make the call to the listItem service.
+		  greetSvc.removeFromList( item, callback );
 	}
 }
