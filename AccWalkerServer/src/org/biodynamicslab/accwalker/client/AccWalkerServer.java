@@ -6,36 +6,24 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class AccWalkerServer implements EntryPoint, ClickHandler, KeyPressHandler {
+public class AccWalkerServer implements EntryPoint {
 	
 	/**The mainPanel to hold the UI elements*/
 	private VerticalPanel mainPanel = new VerticalPanel();
 	
 	/**The flexTable to display the list items*/
 	private FlexTable listFlexTable = new FlexTable();
-	
-	/**The processPanel to add items to the list*/
-	private HorizontalPanel analyzePanel = new HorizontalPanel();
-	
-	/**The trial text to display to the user*/
-	private TextBox trialText = new TextBox();
-	
-	/**The add item button to add items to the list*/
-	private Button btnAnalyzeWalker = new Button( "Analyze" );
-	
+
 	/**The list of trials*/
 	private ArrayList<String> mTrials;
 	
@@ -55,49 +43,17 @@ public class AccWalkerServer implements EntryPoint, ClickHandler, KeyPressHandle
 	    listFlexTable.setCellPadding( 6 );
 	    listFlexTable.getCellFormatter().addStyleName( 0, 3, "listRemoveColumn" );
 	
-	    // Assemble Add Item panel.
-	    analyzePanel.add( trialText );
-	    analyzePanel.add( btnAnalyzeWalker );
-	    analyzePanel.addStyleName( "addPanel" );
-
 	    // Assemble Main panel.
 	    mainPanel.add( listFlexTable );
-	    mainPanel.add( analyzePanel );
 	    mainPanel.addStyleName( "mainPanel" );
 	    
 	    // Associate the Main panel with the HTML host page.
 	    RootPanel.get( "accwalkerServer" ).add( mainPanel );
 	    
-	    // Move cursor focus to the input box.
-	    trialText.setFocus( true );
-	    
 	    //Get the list from the server and set up the ArrayList to hold the data
 	    mTrials= new ArrayList<String>();
 	    getList();
-	    
-	    btnAnalyzeWalker.addClickHandler( this );
-	    
-	    trialText.addKeyPressHandler( this );
-	}
 	
-	/**
-	 * The onClick method handles user interaction from the mouse
-	 * 
-	 * @param the event that was fired
-	 */
-	@Override
-	public void onClick( ClickEvent event ) {
-
-	}
-	
-	/**
-	 * The onKeyPress method handles events from the key board
-	 * 
-	 * @param the key that was pressed by the user
-	 */
-	@Override
-	public void onKeyPress( KeyPressEvent event ){
-		
 	}
 	
   /**
@@ -111,10 +67,15 @@ public class AccWalkerServer implements EntryPoint, ClickHandler, KeyPressHandle
 		  listFlexTable.setText( row, 0, trial );
 		  listFlexTable.getCellFormatter().addStyleName( row, 3, "listRemoveColumn" );
 		  
-		  trialText.setFocus( true );
-		  trialText.setText( "" );
-
-		  //Create remove buttons dynamically
+		  //Create buttons dynamically
+		  Button btnPlot= new Button( "Plot Data" );
+		  btnPlot.addClickHandler(new ClickHandler() {
+			  
+			  public void onClick( ClickEvent event ) {
+				  new PlotDialog().show();
+			  }
+		  });
+		  
 		  Button btnRemoveTrial = new Button( "x" );
 		  btnRemoveTrial.addClickHandler(new ClickHandler( ) {
 			 
@@ -127,7 +88,8 @@ public class AccWalkerServer implements EntryPoint, ClickHandler, KeyPressHandle
 			  }
 		  });
 		  
-		  listFlexTable.setWidget(row, 3, btnRemoveTrial );
+		  listFlexTable.setWidget(row, 3, btnPlot );
+		  listFlexTable.setWidget(row, 4, btnRemoveTrial );
 	  }
 
 	/**
@@ -190,5 +152,34 @@ public class AccWalkerServer implements EntryPoint, ClickHandler, KeyPressHandle
 		  
 		  // Make the call to the listItem service.
 		  greetSvc.removeFromList( item, callback );
+	}
+	
+	 
+	private static class PlotDialog extends DialogBox {
+
+		public PlotDialog() {
+		      
+			// Set the dialog box's caption.
+			setText("Plot Data");
+
+			// Enable animation.
+			setAnimationEnabled(true);
+			
+			// Enable glass background.
+			setGlassEnabled(true);
+			// DialogBox is a SimplePanel, so you have to set its widget property to
+			// whatever you want its contents to be.
+			Button ok = new Button("OK");
+		      
+			ok.addClickHandler(new ClickHandler() {
+		        
+				public void onClick(ClickEvent event) {
+
+					PlotDialog.this.hide();
+				}
+			});
+		      
+			setWidget(ok);
+		}	  
 	}
 }

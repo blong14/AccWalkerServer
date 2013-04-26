@@ -1,5 +1,7 @@
 package org.biodynamicslab.accwalker.server;
 
+import java.util.ArrayList;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
@@ -24,9 +26,9 @@ public class Walker {
 	
 	/**The data in the Z axis*/
 	@Persistent
-	private float[] DataZ;
+	private ArrayList<Float> DataZ;
 	
-	public Walker( String trial, int time, float[] DataZ ){
+	public Walker( String trial, int time, ArrayList<Float> DataZ ){
 		
 		this.trial= trial;
 		this.time= time;
@@ -49,7 +51,7 @@ public class Walker {
 		return time;
 	}
 	
-	public float[] getDataZ(){
+	public ArrayList<Float> getDataZ(){
 		return DataZ;
 	}
 }
