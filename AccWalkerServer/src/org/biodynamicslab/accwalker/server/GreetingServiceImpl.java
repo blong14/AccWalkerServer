@@ -28,6 +28,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	    try {
 	    	
 	    	Query q = pm.newQuery( Walker.class );
+	    	
 	        @SuppressWarnings("unchecked")
 			List<Walker> mWalkers = (List<Walker>) q.execute();
 	        
@@ -48,11 +49,13 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	public String[] getList() {
 		
 		PersistenceManager pm = getPersistenceManager();
+		
 		List<String> mWalkers= new ArrayList<String>();
 		
 		try{
 		
 			Query q= pm.newQuery( Walker.class );
+			q.setOrdering( "trial ascending" );
 			
 			@SuppressWarnings("unchecked")
 			List<Walker> walkCollections = (List<Walker>) q.execute();
@@ -68,6 +71,36 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		}
 		
 		return (String[]) mWalkers.toArray( new String[0] );
+	}
+	
+	@Override
+	public ArrayList<Float> getData( String trial ) {
+		
+		java.util.ArrayList<Float> data = null;
+	
+	    PersistenceManager pm = getPersistenceManager();
+	    
+	    try {
+	    	
+	    	Query q = pm.newQuery( Walker.class );
+	    	
+	        @SuppressWarnings("unchecked")
+			List<Walker> mWalkers = ( List<Walker> ) q.execute();
+	        
+	        for ( Walker nWalker : mWalkers ) {
+	        	
+	            if ( trial.equalsIgnoreCase( nWalker.getTrial() ) ) {
+	            
+	              data = new java.util.ArrayList<Float>( nWalker.getDataZ() );
+	            }
+	          }
+	        
+	    } finally {
+	    	
+	      pm.close();
+	    }
+	    
+		return data;
 	}
 	
 	private PersistenceManager getPersistenceManager() {

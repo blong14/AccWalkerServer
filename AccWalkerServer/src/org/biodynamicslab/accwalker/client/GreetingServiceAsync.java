@@ -1,5 +1,7 @@
 package org.biodynamicslab.accwalker.client;
 
+import java.util.ArrayList;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -10,5 +12,8 @@ public interface GreetingServiceAsync {
 	void removeFromList( String input, @SuppressWarnings("rawtypes") AsyncCallback success );
 	
 	void getList( AsyncCallback<String[]> callback )
+			throws IllegalArgumentException;
+	
+	void getData( String input, AsyncCallback <ArrayList<Float> > callback )
 			throws IllegalArgumentException;
 }

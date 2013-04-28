@@ -17,8 +17,8 @@
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
-  <!-- Other module inherits                                      -->
-
+  <!-- Other module inherits-->
+  <inherits name='com.google.gwt.visualization.Visualization'/>
   <!-- Specify the app entry point class.                         -->
   <entry-point class='org.biodynamicslab.accwalker.client.AccWalkerServer'/>
 
