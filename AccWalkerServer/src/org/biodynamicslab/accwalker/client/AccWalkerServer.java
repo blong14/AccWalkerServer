@@ -12,9 +12,12 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.DataView;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -30,21 +33,21 @@ public class AccWalkerServer implements EntryPoint {
 	/**The list of trials*/
 	private ArrayList<String> mTrials;
 	
-	/**The data table to plot data from*/
-	private DataView dataTable;
-	
 	/**The list item service to talk to the server*/
 	private GreetingServiceAsync greetSvc = GWT.create( GreetingService.class );
 	
+	/**The panel to plot the data*/
+	private VerticalPanel vPanel= new VerticalPanel();
+	
+	/**The LineChart to plot data*/
+	private LineChart dataChart;
+	  
 	/**
 	 * Entry point method.
 	 */
 	public void onModuleLoad() {
 		
-		//First, Create table for the list data.
-		listFlexTable.setText( 0, 0, "Trial Info:" );
-	    
-	    // Add styles to elements in the stock list table.
+	    // Add styles to elements to the trial list
 	    listFlexTable.addStyleName( "itemList" );
 	    listFlexTable.setCellPadding( 6 );
 	    listFlexTable.getCellFormatter().addStyleName( 0, 3, "listRemoveColumn" );
@@ -52,9 +55,10 @@ public class AccWalkerServer implements EntryPoint {
 	    // Assemble Main panel.
 	    mainPanel.add( listFlexTable );
 	    mainPanel.addStyleName( "mainPanel" );
-	    
-	    // Associate the Main panel with the HTML host page.
+	   
+	    // Associate the Main panel and Plot panel with the HTML host page.
 	    RootPanel.get( "accwalkerServer" ).add( mainPanel );
+	    RootPanel.get( "accwalkerPlotter" ).add( vPanel );
 	    
 	    //Get the list from the server and set up the ArrayList to hold the data
 	    mTrials= new ArrayList<String>();
@@ -108,25 +112,27 @@ public class AccWalkerServer implements EntryPoint {
 	
 	 /**
 	  * Populate the data table with data
+	  * 
+	  * @param data The data to be added to the dataTable
+	  * @return A DataTable with the data to be plotted
 	  */
-	  private void createTable( ArrayList<Float> data ) {
+	  private AbstractDataTable createTable( ArrayList<Float> data ) {
 		    
-		  int DATAZ= 0;
-		
 		  // Underlying data
 		  DataTable mData = DataTable.create();
 		
-		  mData.addColumn( ColumnType.STRING, "DataZ" );
+		  mData.addColumn( ColumnType.NUMBER, "Index" );
+		  mData.addColumn( ColumnType.NUMBER, "DataZ" );
 		  mData.addRows( data.size() );
 		  
+		  //Now move through the data added each data point to the DataTable
 		  for( int row= 0; row < data.size(); row++ ){
 			  
-			  mData.setValue( row, DATAZ, data.get( row ) );
+			  mData.setValue( row, 0, row );
+			  mData.setValue( row, 1, data.get( row ) );
 		  }
 		
-		// Data view -- read only, and no location column
-		dataTable = DataView.create( mData );
-		
+		return mData;
 	  }
 
 	  /**
@@ -143,15 +149,42 @@ public class AccWalkerServer implements EntryPoint {
 		  // Set up the callback objects
 		  AsyncCallback<ArrayList<Float>> callback = new AsyncCallback<ArrayList<Float>>() {
 	    
+			  //Handle server communication error
 			  public void onFailure(Throwable caught) {
 				  
 				  Window.alert( "Server Error: " + caught.toString() );
 			  }
 
-			  public void onSuccess( ArrayList<Float> result ) {
-				  
-				  Window.alert( "Data retreived: " + result.get( 2 ) );
-				  //createTable( result );
+			  //Success! 
+			  public void onSuccess( final ArrayList<Float> result ) {
+				   				  
+			      Runnable onLoadCallback = new Runnable() {
+			    	
+			          public void run() {
+			        	  
+			        	  //Create the DataTable
+			              AbstractDataTable data = createTable( result );
+			              
+			              //Create and set options for the plot
+			              Options options = Options.create();
+			              options.setGridlineColor( "white" );
+			              options.remove( "legend" );
+			              options.setWidth(800); 
+			              options.setHeight(480); 
+			              
+			              //Now, plot the data
+						  if( dataChart == null )
+							  dataChart = new LineChart( data, options );
+						  else
+							  dataChart.draw( data, options );
+			             
+						  //Add plot to the plotting panel
+			              vPanel.add( dataChart );
+			              vPanel.addStyleName( "mainPanel" );
+			          }
+			      };
+
+			      VisualizationUtils.loadVisualizationApi( onLoadCallback, LineChart.PACKAGE );
 			  }
 		  };
 		  
@@ -171,11 +204,13 @@ public class AccWalkerServer implements EntryPoint {
 		// Set up the callback objects
 		AsyncCallback<String[]> callback = new AsyncCallback<String[]>() {
 
+			//Handle server communication error
 			public void onFailure(Throwable caught) {
 	
 				Window.alert( "Server Error: " + caught.toString() );
 			}
 
+			//Success!
 			public void onSuccess( String[] result ) {
 		
 				//An array of trial names has been returned from the server

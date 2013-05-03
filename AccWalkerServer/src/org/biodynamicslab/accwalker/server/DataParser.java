@@ -57,7 +57,7 @@ public class DataParser extends HttpServlet {
 				sb.append( line );
 			}
 			
-			//Send data to be parsed
+			//Send data to be parsed and saved to the server
 			parseData( sb.toString() );
 	
 		} catch (IOException e) {

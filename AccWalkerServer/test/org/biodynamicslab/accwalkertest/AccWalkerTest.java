@@ -56,14 +56,15 @@ public class AccWalkerTest {
     
     private void insertWalker() throws JSONException {
     	
-    	String trial= "testTrial";
+    	String trial= "anotherTestTrial";
     	int time= 5;
     	ArrayList<Float> data= new ArrayList<Float>();
     	data.add( new Float(0.0) );
     	data.add( new Float(0.1) );
-    	data.add( new Float(0.2) );
+    	data.add( new Float(2.2) );
     	data.add( new Float(0.3) );
-    	data.add( new Float(1.0) );
+    	data.add( new Float(0.3) );
+    	data.add( new Float(2.0) );
     	
     	HttpPost post = new HttpPost( "http://localhost:8888/accwalkerserver/data" );
     	
