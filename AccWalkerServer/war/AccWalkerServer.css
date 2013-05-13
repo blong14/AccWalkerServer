@@ -5,29 +5,11 @@ body {
   text-align: center;
 }
 
-.mainPanel {
-	margin: auto;
+h1 {
+	font-size: 2em;
+	font-weight: bold;
+	margin: 40px 0px 70px;
+	text-align: center;
 }
 
-/* list flex table */
-.itemList {
-  border: 1px solid silver;
-  padding: 2px;
-  margin-bottom:6px;
-}
 
-/*List Remove column */
-.listRemoveColumn {
-  text-align: center;
-}
-
-/* Add item panel */
-.addPanel {
-  /*margin: 10px 0px 15px 0px;*/
-  margin: auto;
-}
-
-/* item list, the Remove button */
-.gwt-Button-remove {
-  width: 50px;
-}

@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
@@ -18,6 +16,10 @@ import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.MenuItemSeparator;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -25,203 +27,188 @@ import com.google.gwt.visualization.client.visualizations.corechart.Options;
 public class AccWalkerServer implements EntryPoint {
 	
 	/**The mainPanel to hold the UI elements*/
-	private VerticalPanel mainPanel = new VerticalPanel();
+	private HorizontalPanel menuPanel = new HorizontalPanel();
 	
-	/**The flexTable to display the list items*/
-	private FlexTable listFlexTable = new FlexTable();
-
-	/**The list of trials*/
-	private ArrayList<String> mTrials;
+	/**The panel to plot the data*/
+	private VerticalPanel plotPanel= new VerticalPanel();
+	
+	/**List of trial names*/
+	private ArrayList<String> mTrials= new ArrayList<String>();
+	
+	/**The LineChart to plot data*/
+	private LineChart dataChart;
+	
+	/**The main menu bar item*/
+	private final MenuBar menuBar = new MenuBar( false );
+	
+	/**The plot menu bar to plot the data for a trial*/
+	private final MenuBar Plot = new MenuBar( true );
+	
+	/**About menu item*/
+	private MenuItem mntmAbout;
+	
+	/**Analyze menu item*/
+	private MenuItem mntmAnalyze;
+	
+	/**Menu separator*/
+	private final MenuItemSeparator separator1 = new MenuItemSeparator();
+	
+	/**Menu separator*/
+	private final MenuItemSeparator separator2 = new MenuItemSeparator();
 	
 	/**The list item service to talk to the server*/
 	private GreetingServiceAsync greetSvc = GWT.create( GreetingService.class );
 	
-	/**The panel to plot the data*/
-	private VerticalPanel vPanel= new VerticalPanel();
+	/**The data associated with a trial*/
+	private ArrayList<Float> trialData= new ArrayList<Float>();
 	
-	/**The LineChart to plot data*/
-	private LineChart dataChart;
+	/**Variable used to determine if a trial was deleted from the server or not*/
+	private boolean deleted;
 	  
 	/**
 	 * Entry point method.
 	 */
 	public void onModuleLoad() {
-		
-	    // Add styles to elements to the trial list
-	    listFlexTable.addStyleName( "itemList" );
-	    listFlexTable.setCellPadding( 6 );
-	    listFlexTable.getCellFormatter().addStyleName( 0, 3, "listRemoveColumn" );
-	
-	    // Assemble Main panel.
-	    mainPanel.add( listFlexTable );
-	    mainPanel.addStyleName( "mainPanel" );
-	   
-	    // Associate the Main panel and Plot panel with the HTML host page.
-	    RootPanel.get( "accwalkerServer" ).add( mainPanel );
-	    RootPanel.get( "accwalkerPlotter" ).add( vPanel );
+
+	    RootLayoutPanel rootLayoutPanel = RootLayoutPanel.get();
+	    getTrialNames();
+	    mTrials.add("Test");
 	    
-	    //Get the list from the server and set up the ArrayList to hold the data
-	    mTrials= new ArrayList<String>();
-	    getList();
+	    DockPanel dockPanel = new DockPanel();
+	    dockPanel.add( menuPanel, DockPanel.NORTH );
+	    
+	    menuPanel.add( menuBar );
+	    
+	    mntmAbout = new MenuItem( "About", false, new Command(){
+	    	@Override
+	    	public void execute(){
+	    		Window.alert( "Coming Soon!" );
+	    	}
+	    });
+	    menuBar.addItem( mntmAbout );
+	    menuBar.addSeparator( separator1 );
+	   
+	    for( int i= 0; i < mTrials.size(); i++){
+	    	
+	    	Plot.addItem( addPlotMenuItem( mTrials.get(i) ) );
+	    }
+	    menuBar.addItem( "Plot", Plot );
+	    menuBar.addSeparator( separator2 );
+	    
+	    mntmAnalyze = new MenuItem( "Analyze Data", false, new Command(){
+	    	@Override
+	    	public void execute(){
+	    		Window.alert( "Coming Soon!" );
+	    	}
+	    });
+	    menuBar.addItem( mntmAnalyze );
+	    
+	    
+	    
+	    dockPanel.add( plotPanel, DockPanel.CENTER );
+	    rootLayoutPanel.add( dockPanel );
 	}
-	
-  /**
-   * Add items to FlexTable. Executed when the user clicks the addItemButton or
-   * presses enter in the itemText.
-   * 
-   * @param trial The trial info to add to the table
-   * @param trialIndex The trial index value
-   */
-	private void addToTable( final String trial, final int trialIndex ) {
-	
-		  // Add the trial to the table.
-		  int row = listFlexTable.getRowCount();
-		  listFlexTable.setText( row, 0, trial );
-		  listFlexTable.getCellFormatter().addStyleName( row, 3, "listRemoveColumn" );
-		  
-		  //Create buttons dynamically
-		  //The plot button
-		  Button btnPlot= new Button( "Plot Data" );
-		  btnPlot.addClickHandler(new ClickHandler() {
-			  
-			  public void onClick( ClickEvent event ) {
-				  
-				 //The btnPlot was fired retrieve the data from the server
-				 getData( trial );
-			  }
-		  });
-		  
-		  //The remove button
-		  Button btnRemoveTrial = new Button( "x" );
-		  btnRemoveTrial.addClickHandler(new ClickHandler( ) {
-			 
-			  public void onClick( ClickEvent event ) {
-				  
-				  //The btnRemoveTrial was fired, remove from database and flex table 
-				  int removedIndex = mTrials.indexOf( trial );
-				  removeFromList( trial );
-				  mTrials.remove( removedIndex );
-			      listFlexTable.removeRow( trialIndex + 1 );
-			  }
-		  });
-		  
-		  //Add buttons to the flex table
-		  listFlexTable.setWidget(row, 3, btnPlot );
-		  listFlexTable.setWidget(row, 4, btnRemoveTrial );
-	  }
-	
-	 /**
-	  * Populate the data table with data
-	  * 
-	  * @param data The data to be added to the dataTable
-	  * @return A DataTable with the data to be plotted
-	  */
-	  private AbstractDataTable createTable( ArrayList<Float> data ) {
-		    
-		  // Underlying data
-		  DataTable mData = DataTable.create();
+	 
+	/**
+	 * Populate the data table with data
+	 * 
+	 * @param data The data to be added to the dataTable
+	 * @return A DataTable with the data to be plotted
+	 * 
+	 */
+	private AbstractDataTable createTable( ArrayList<Float> data ) {
 		
-		  mData.addColumn( ColumnType.NUMBER, "Index" );
-		  mData.addColumn( ColumnType.NUMBER, "DataZ" );
-		  mData.addRows( data.size() );
-		  
-		  //Now move through the data added each data point to the DataTable
-		  for( int row= 0; row < data.size(); row++ ){
-			  
-			  mData.setValue( row, 0, row );
-			  mData.setValue( row, 1, data.get( row ) );
-		  }
+		// Underlying dataDataTable 
+		DataTable mData = DataTable.create();
+		mData.addColumn( ColumnType.NUMBER, "Index" );
+		mData.addColumn( ColumnType.NUMBER, "DataZ" );
+		mData.addRows( data.size() );
+		
+		//Now move through the data added each data point to the DataTable
+		for( int row= 0; row < data.size(); row++ ){
+			
+			mData.setValue( row, 0, row );
+			mData.setValue( row, 1, data.get( row ) );
+		}
 		
 		return mData;
 	  }
-
-	  /**
-	   * The getData method handles retrieving the data associated with a trial
-	   * 
-	   * @param trial The trial to get data from
-	   */
-	  private void getData( String trial ) {
-		  
-		  // Initialize the service proxy.
-		  if ( greetSvc == null )
-			  greetSvc = GWT.create( GreetingService.class );
-
-		  // Set up the callback objects
-		  AsyncCallback<ArrayList<Float>> callback = new AsyncCallback<ArrayList<Float>>() {
-	    
-			  //Handle server communication error
-			  public void onFailure(Throwable caught) {
-				  
-				  Window.alert( "Server Error: " + caught.toString() );
-			  }
-
-			  //Success! 
-			  public void onSuccess( final ArrayList<Float> result ) {
-				   				  
-			      Runnable onLoadCallback = new Runnable() {
-			    	
-			          public void run() {
-			        	  
-			        	  //Create the DataTable
-			              AbstractDataTable data = createTable( result );
-			              
-			              //Create and set options for the plot
-			              Options options = Options.create();
-			              options.setGridlineColor( "white" );
-			              options.remove( "legend" );
-			              options.setWidth(800); 
-			              options.setHeight(480); 
-			              
-			              //Now, plot the data
-						  if( dataChart == null )
-							  dataChart = new LineChart( data, options );
-						  else
-							  dataChart.draw( data, options );
-			             
-						  //Add plot to the plotting panel
-			              vPanel.add( dataChart );
-			              vPanel.addStyleName( "mainPanel" );
-			          }
-			      };
-
-			      VisualizationUtils.loadVisualizationApi( onLoadCallback, LineChart.PACKAGE );
-			  }
-		  };
-		  
-		  // Make the call to the server
-		  greetSvc.getData( trial, callback );
-	  }
-	  
+	
+	private Options getOptions(){
+		
+		Options options = Options.create();
+		options.setGridlineColor( "white" );
+		options.setColors( "red" );
+		options.setLegend( "none" );
+		options.setWidth(800);
+		options.setHeight(480);
+		
+		return options;
+	}
+	
 	/**
-	 * The getList method retrieves the list off the server
+	 * The addPlotMenuItem method handles adding trials to the plotting menu options
+	 * 
+	 * @param trial The trial to plot and to be added to the plot menu
+	 * @return The MenuItem to add to the plot menu
 	 */
-	private void getList() {
+	private MenuItem addPlotMenuItem( final String trial ){
+		
+		MenuItem mItem= new MenuItem( trial, false, new Command(){
+			
+			@Override
+			public void execute(){
+				
+				Runnable onLoadCallback= new Runnable() {
+					
+					public void run() {
+						
+						getData( trial );
+
+						//Create the DataTable
+						AbstractDataTable data = createTable( trialData );
+			              
+						//Now, plot the data
+						if( dataChart == null )
+							dataChart = new LineChart( data, getOptions() );
+						else
+							dataChart.draw( data, getOptions() );
+	
+						plotPanel.add( dataChart );
+					}
+				};
+				
+				VisualizationUtils.loadVisualizationApi( onLoadCallback, LineChart.PACKAGE );
+			}
+		});
+		
+		return mItem;
+	}
+	
+	/**
+	 * The getTrialNames method retrieves the list of trial names off the server
+	 */
+	private void getTrialNames(){
 		
 		// Initialize the service proxy.
 		if ( greetSvc == null )
 			greetSvc = GWT.create( GreetingService.class );
 		
-		// Set up the callback objects
+		// Set up the callback object
 		AsyncCallback<String[]> callback = new AsyncCallback<String[]>() {
 
 			//Handle server communication error
 			public void onFailure(Throwable caught) {
-	
-				Window.alert( "Server Error: " + caught.toString() );
+				mTrials.add( "ERROR ERROR" );
 			}
 
 			//Success!
 			public void onSuccess( String[] result ) {
 		
-				//An array of trial names has been returned from the server
-				for( int i= 0; i < result.length; i++ ){
-		
-					//Now move through this array adding the trial names to the flex table
-					mTrials.add( result[i] ); 
-					int itemIndex= mTrials.indexOf( result[i] );
-				
-					//Called to actually add the trials to the table
-					addToTable( result[i], itemIndex );
+				//Move through the result saving each trial name
+				for(int i=0; i < result.length; i++){
+					
+					mTrials.add( result[i] );
 				}
 			}
 		};
@@ -230,13 +217,52 @@ public class AccWalkerServer implements EntryPoint {
 		greetSvc.getList( callback );
 	}
 	
+  /**
+   * The getData method handles retrieving the data associated with a trial
+   * 
+   * @param trial The trial to get data from
+   */
+	private void getData( String trial ) {
+	  
+	  // Initialize the service proxy.
+	  if ( greetSvc == null )
+		  greetSvc = GWT.create( GreetingService.class );
+
+	  // Set up the callback objects
+	  AsyncCallback<ArrayList<Float>> callback = new AsyncCallback<ArrayList<Float>>() {
+    
+		  //Handle server communication error
+		  public void onFailure(Throwable caught) {
+			  //TODO: Handle Server Error in getData method
+		  }
+
+		  //Success! 
+		  public void onSuccess( final ArrayList<Float> result ) {
+			   				  
+			  if( result == null ){
+				  Window.alert( "No data to plot" );
+				  return;
+			  }
+			  
+		      for(int i= 0; i < result.size(); i++){
+		    	  
+		    	  trialData.add( result.get(i) );
+		      }
+		  }
+	  };
+	  
+	  // Make the call to the server
+	  greetSvc.getData( trial, callback );
+
+	}
+	
 	/**
 	 * The removeItem method handles removing trials from the server 
 	 * 
 	 * @param trial The trial to remove from the list
 	 */
 	@SuppressWarnings("rawtypes")
-	private void removeFromList( String trial ){
+	public boolean removeFromServer( String trial ){
 
 		// Initialize the service proxy.
 		if ( greetSvc == null )
@@ -247,17 +273,20 @@ public class AccWalkerServer implements EntryPoint {
 	 
 			public void onFailure(Throwable caught) {
 		
-				Window.alert( "Server Error: " + caught.toString() );
+				//Server error, data was not deleted
+				deleted= false;
 			}
 
 			public void onSuccess( Object result ) {
 		
 				//Alert user that the trail has been deleted
-				Window.alert( "Trial Deleted" );
+				deleted= true;
 			}
 		};
 
 		// Make the call to the server.
 		greetSvc.removeFromList( trial, callback );
+		
+		return deleted;
 	}
 }

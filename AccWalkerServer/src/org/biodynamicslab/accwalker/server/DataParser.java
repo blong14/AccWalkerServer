@@ -22,7 +22,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  *
  */
 @SuppressWarnings("serial")
-@RemoteServiceRelativePath("data")
+@RemoteServiceRelativePath("uploadData")
 public class DataParser extends HttpServlet {
 	
 	/**The Factory to persist objects on the server*/

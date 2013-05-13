@@ -8,7 +8,7 @@
   
   <servlet-mapping>
     <servlet-name>DataParser</servlet-name>
-    <url-pattern>/accwalkerserver/data</url-pattern>
+    <url-pattern>/accwalkerserver/uploadData</url-pattern>
   </servlet-mapping>
   
   <servlet>
