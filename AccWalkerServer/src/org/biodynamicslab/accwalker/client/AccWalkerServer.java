@@ -18,7 +18,6 @@ import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.MenuItemSeparator;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -43,22 +42,15 @@ public class AccWalkerServer implements EntryPoint {
 	/**Analyze menu item*/
 	private MenuItem mntmAnalyze;
 	
-	/**Menu separator*/
-	private final MenuItemSeparator separator1 = new MenuItemSeparator();
-	
-	/**Menu separator*/
-	private final MenuItemSeparator separator2 = new MenuItemSeparator();
-	
 	/**The list item service to talk to the server*/
 	private GreetingServiceAsync greetSvc = GWT.create( GreetingService.class );
-	
-	/**The data associated with a trial*/
-	private ArrayList<Float> trialData= new ArrayList<Float>();
 	
 	/**Variable used to determine if a trial was deleted from the server or not*/
 	private boolean deleted;
 	
-	private VerticalPanel dockPanel;
+	private VerticalPanel mainPanel;
+	
+	private ArrayList<Float> trialData= new ArrayList<Float>();
 	  
 	/**
 	 * Entry point method.
@@ -66,10 +58,10 @@ public class AccWalkerServer implements EntryPoint {
 	public void onModuleLoad() {
 		
 	    //Set up view layout
-	    dockPanel = new VerticalPanel();
-	    RootPanel.get( "rootPanel" ).add( dockPanel );
+	    mainPanel = new VerticalPanel();
+	    RootPanel.get( "rootPanel" ).add( mainPanel );
 	    
-	    dockPanel.add( setUpMenuBar() );
+	    mainPanel.add( setUpMenuBar() );
 
 		getTrialNames();
 	}
@@ -83,11 +75,10 @@ public class AccWalkerServer implements EntryPoint {
 	    		Window.alert( "Coming Soon!" );
 	    	}
 	    });
+	    menuBar.setStyleName( "gwt-MenuBar" );
 	    menuBar.addItem( mntmAbout );
-	    menuBar.addSeparator( separator1 );
 	  
 	    menuBar.addItem( "Plot", Plot );
-	    menuBar.addSeparator( separator2 );
 	    
 	    //Add analyze menu item
 	    mntmAnalyze = new MenuItem( "Analyze Data", false, new Command(){
@@ -127,19 +118,7 @@ public class AccWalkerServer implements EntryPoint {
 		
 		return mData;
 	}
-	
-	private Options getOptions(){
 		
-		Options options = Options.create();
-		options.setGridlineColor( "white" );
-		options.setColors( "red" );
-		options.setLegend( "none" );
-		options.setWidth(800);
-		options.setHeight(480);
-		
-		return options;
-	}
-	
 	/**
 	 * The addPlotMenuItem method handles adding trials to the plotting menu options
 	 * 
@@ -153,7 +132,7 @@ public class AccWalkerServer implements EntryPoint {
 			@Override
 			public void execute(){
 				
-				final ArrayList<Float> dataToPlot= getData( trial );
+				getData( trial );
 				
 				Runnable onLoadCallback= new Runnable() {
 					
@@ -162,16 +141,23 @@ public class AccWalkerServer implements EntryPoint {
 					public void run() {
 						
 						//Create the DataTable
-						AbstractDataTable data = createTable( dataToPlot );
+						AbstractDataTable data = createTable( trialData );
+						
+						Options options = Options.create();
+						options.setGridlineColor( "white" );
+						options.setColors( "red" );
+						options.setLegend( "none" );
+						options.setWidth(800);
+						options.setHeight(480);
 			              
 						//Now, plot the data
-						dataChart = new LineChart( data, getOptions() );
+						dataChart = new LineChart( data, options );
 						
 						if( plotPanel.isVisible() )
-							plotPanel.clear();
+							plotPanel.clear(); RootPanel.get( "plotPanel" ).clear();
 						
-						RootPanel.get("plotPanel").add( plotPanel );
 						plotPanel.add( dataChart );
+						RootPanel.get( "plotPanel" ).add( plotPanel );
 					}
 				};
 				
@@ -221,13 +207,11 @@ public class AccWalkerServer implements EntryPoint {
    * 
    * @param trial The trial to get data from
    */
-	private ArrayList<Float> getData( String trial ) {
+	private void getData( String trial ) {
 	  
 		// Initialize the service proxy.
 		if ( greetSvc == null )
 			greetSvc = GWT.create( GreetingService.class );
-
-		final ArrayList<Float> data= new ArrayList<Float>();
 		
 		// Set up the callback objects
 		AsyncCallback<ArrayList<Float>> callback = new AsyncCallback<ArrayList<Float>>() {
@@ -240,6 +224,9 @@ public class AccWalkerServer implements EntryPoint {
 		  //Success! 
 		  public void onSuccess( final ArrayList<Float> result ) {
 			   				  
+			  if( !trialData.isEmpty() )
+				  trialData.clear();
+			  
 			  if( result == null ){
 				  Window.alert( "No data to plot" );
 				  return;
@@ -247,16 +234,13 @@ public class AccWalkerServer implements EntryPoint {
 			  			  
 		      for(int i= 0; i < result.size(); i++){
 		    	  
-		    	  data.add( result.get(i) );
+		    	  trialData.add( result.get(i) );
 		      }
 		  }
 	  };
 	  
 	  // Make the call to the server
 	  greetSvc.getData( trial, callback );
-	  
-	  return data;
-	
 	}
 	
 	/**
