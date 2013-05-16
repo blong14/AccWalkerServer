@@ -12,7 +12,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
-//import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -56,14 +56,14 @@ public class AccWalkerTest {
     
     private void insertWalker() throws JSONException {
     	
-    	String trial= "Sub001";
+    	String trial= "Sub002";
     	int time= 5;
     	ArrayList<Float> data= new ArrayList<Float>();
     	data.add( new Float(0.0) );
     	data.add( new Float(0.1) );
     	data.add( new Float(2.2) );
     	data.add( new Float(0.3) );
-    	data.add( new Float(0.3) );
+    	data.add( new Float(2.3) );
     	data.add( new Float(2.0) );
     	data.add( new Float(1.0) );
     	
@@ -82,8 +82,10 @@ public class AccWalkerTest {
 			StringEntity se = new StringEntity( json.toString() );
 			se.setContentType(new BasicHeader( HTTP.CONTENT_TYPE, "application/json" ) );
 			post.setEntity( se );
-			//HttpResponse response = client.execute( post );
+			HttpResponse response = client.execute( post );
 			client.execute( post );
+			
+			System.out.println(response.getStatusLine());
 			
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();

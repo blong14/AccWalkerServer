@@ -12,4 +12,8 @@ h1 {
 	text-align: center;
 }
 
+/* Add plot panel */
+.plotPanel {
+  margin: auto;
+}
 

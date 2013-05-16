@@ -6,9 +6,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
@@ -31,12 +30,6 @@ public class AccWalkerServer implements EntryPoint {
 	
 	/**The panel to plot the data*/
 	private VerticalPanel plotPanel= new VerticalPanel();
-	
-	/**List of trial names*/
-	private ArrayList<String> mTrials= new ArrayList<String>();
-	
-	/**The LineChart to plot data*/
-	private LineChart dataChart;
 	
 	/**The main menu bar item*/
 	private final MenuBar menuBar = new MenuBar( false );
@@ -64,21 +57,26 @@ public class AccWalkerServer implements EntryPoint {
 	
 	/**Variable used to determine if a trial was deleted from the server or not*/
 	private boolean deleted;
+	
+	private VerticalPanel dockPanel;
 	  
 	/**
 	 * Entry point method.
 	 */
 	public void onModuleLoad() {
+		
+	    //Set up view layout
+	    dockPanel = new VerticalPanel();
+	    RootPanel.get( "rootPanel" ).add( dockPanel );
+	    
+	    dockPanel.add( setUpMenuBar() );
 
-	    RootLayoutPanel rootLayoutPanel = RootLayoutPanel.get();
-	    getTrialNames();
-	    mTrials.add("Test");
-	    
-	    DockPanel dockPanel = new DockPanel();
-	    dockPanel.add( menuPanel, DockPanel.NORTH );
-	    
-	    menuPanel.add( menuBar );
-	    
+		getTrialNames();
+	}
+	 
+	private HorizontalPanel setUpMenuBar() {
+	
+		//Create about menu item
 	    mntmAbout = new MenuItem( "About", false, new Command(){
 	    	@Override
 	    	public void execute(){
@@ -87,14 +85,11 @@ public class AccWalkerServer implements EntryPoint {
 	    });
 	    menuBar.addItem( mntmAbout );
 	    menuBar.addSeparator( separator1 );
-	   
-	    for( int i= 0; i < mTrials.size(); i++){
-	    	
-	    	Plot.addItem( addPlotMenuItem( mTrials.get(i) ) );
-	    }
+	  
 	    menuBar.addItem( "Plot", Plot );
 	    menuBar.addSeparator( separator2 );
 	    
+	    //Add analyze menu item
 	    mntmAnalyze = new MenuItem( "Analyze Data", false, new Command(){
 	    	@Override
 	    	public void execute(){
@@ -103,12 +98,11 @@ public class AccWalkerServer implements EntryPoint {
 	    });
 	    menuBar.addItem( mntmAnalyze );
 	    
+	    //Finally, add the menuPar to the menu panel
+	    menuPanel.add( menuBar );
 	    
-	    
-	    dockPanel.add( plotPanel, DockPanel.CENTER );
-	    rootLayoutPanel.add( dockPanel );
+	    return menuPanel;
 	}
-	 
 	/**
 	 * Populate the data table with data
 	 * 
@@ -132,7 +126,7 @@ public class AccWalkerServer implements EntryPoint {
 		}
 		
 		return mData;
-	  }
+	}
 	
 	private Options getOptions(){
 		
@@ -159,21 +153,24 @@ public class AccWalkerServer implements EntryPoint {
 			@Override
 			public void execute(){
 				
+				final ArrayList<Float> dataToPlot= getData( trial );
+				
 				Runnable onLoadCallback= new Runnable() {
+					
+					private LineChart dataChart;
 					
 					public void run() {
 						
-						getData( trial );
-
 						//Create the DataTable
-						AbstractDataTable data = createTable( trialData );
+						AbstractDataTable data = createTable( dataToPlot );
 			              
 						//Now, plot the data
-						if( dataChart == null )
-							dataChart = new LineChart( data, getOptions() );
-						else
-							dataChart.draw( data, getOptions() );
-	
+						dataChart = new LineChart( data, getOptions() );
+						
+						if( plotPanel.isVisible() )
+							plotPanel.clear();
+						
+						RootPanel.get("plotPanel").add( plotPanel );
 						plotPanel.add( dataChart );
 					}
 				};
@@ -193,26 +190,28 @@ public class AccWalkerServer implements EntryPoint {
 		// Initialize the service proxy.
 		if ( greetSvc == null )
 			greetSvc = GWT.create( GreetingService.class );
-		
-		// Set up the callback object
+
+		// Set up the callback objects
 		AsyncCallback<String[]> callback = new AsyncCallback<String[]>() {
 
 			//Handle server communication error
 			public void onFailure(Throwable caught) {
-				mTrials.add( "ERROR ERROR" );
+
+				Window.alert( "Server Error: " + caught.toString() );
 			}
 
 			//Success!
 			public void onSuccess( String[] result ) {
-		
-				//Move through the result saving each trial name
-				for(int i=0; i < result.length; i++){
-					
-					mTrials.add( result[i] );
+
+				//An array of trial names has been returned from the server
+				for( int i= 0; i < result.length; i++ ){
+
+					//Now move through this array adding the trial names to the list
+					Plot.addItem( addPlotMenuItem( result[i] ) );
 				}
 			}
 		};
-		 
+
 		// Make the call to the server
 		greetSvc.getList( callback );
 	}
@@ -222,14 +221,16 @@ public class AccWalkerServer implements EntryPoint {
    * 
    * @param trial The trial to get data from
    */
-	private void getData( String trial ) {
+	private ArrayList<Float> getData( String trial ) {
 	  
-	  // Initialize the service proxy.
-	  if ( greetSvc == null )
-		  greetSvc = GWT.create( GreetingService.class );
+		// Initialize the service proxy.
+		if ( greetSvc == null )
+			greetSvc = GWT.create( GreetingService.class );
 
-	  // Set up the callback objects
-	  AsyncCallback<ArrayList<Float>> callback = new AsyncCallback<ArrayList<Float>>() {
+		final ArrayList<Float> data= new ArrayList<Float>();
+		
+		// Set up the callback objects
+		AsyncCallback<ArrayList<Float>> callback = new AsyncCallback<ArrayList<Float>>() {
     
 		  //Handle server communication error
 		  public void onFailure(Throwable caught) {
@@ -243,17 +244,19 @@ public class AccWalkerServer implements EntryPoint {
 				  Window.alert( "No data to plot" );
 				  return;
 			  }
-			  
+			  			  
 		      for(int i= 0; i < result.size(); i++){
 		    	  
-		    	  trialData.add( result.get(i) );
+		    	  data.add( result.get(i) );
 		      }
 		  }
 	  };
 	  
 	  // Make the call to the server
 	  greetSvc.getData( trial, callback );
-
+	  
+	  return data;
+	
 	}
 	
 	/**
