@@ -1,2 +1,0 @@
-serviceClass: org.biodynamicslab.accwalker.client.GreetingService
-path: F73DB908279170EBB4E16923DB44D5FA.gwt.rpc

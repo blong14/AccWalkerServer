@@ -19,6 +19,7 @@
 
 	<!-- Other module inherits-->
 	<inherits name='com.google.gwt.visualization.Visualization' />
+	<inherits name='com.google.gwt.json.JSON' />
 	<!-- Specify the app entry point class.                         -->
 	<entry-point class="org.biodynamicslab.accwalker.client.AccWalkerServer"/>
 	<!-- Specify the paths for translatable code                    -->

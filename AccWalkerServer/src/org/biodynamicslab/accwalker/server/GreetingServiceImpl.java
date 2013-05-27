@@ -9,6 +9,8 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 import org.biodynamicslab.accwalker.client.GreetingService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -107,7 +109,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	@Override
 	public ArrayList<Float> getData( String trial ) {
 		
-		java.util.ArrayList<Float> data = null;
+		java.util.ArrayList<Float> data = new ArrayList<Float>();
 	
 	    PersistenceManager pm = getPersistenceManager();
 	    
@@ -119,15 +121,16 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	        @SuppressWarnings("unchecked")
 			List<Walker> mWalkers = ( List<Walker> ) q.execute();
 	        
-	        //Find the appropriate trial from the list on the server
+			//Move through the list of Walker objects on the server
+			//and save their data information to the output array list
 	        for ( Walker nWalker : mWalkers ) {
-	        	
-	            if ( trial.equalsIgnoreCase( nWalker.getTrial() ) ) {
 	            	
+	            if ( trial.equalsIgnoreCase( nWalker.getTrial() ) ) {
+
 	            	//Save the data from the Walker object to the data array list
 	            	data = new java.util.ArrayList<Float>( nWalker.getDataZ() );
 	            }
-	          }
+	        }
 	        
 	    } finally {
 	    	
@@ -135,6 +138,62 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	    }
 	    
 		return data;
+	}
+	
+	public ArrayList<String> getData() throws Exception {
+		
+		java.util.ArrayList<String> data= new ArrayList<String>();
+		
+		PersistenceManager pm= getPersistenceManager();
+		
+		try {
+			
+			//Query all of the Walker objects on the server
+			Query q = pm.newQuery( Walker.class );
+			
+			@SuppressWarnings("unchecked")
+			List<Walker> mWalkers = ( List<Walker> ) q.execute();
+			
+			for ( Walker nWalker : mWalkers ) {
+				
+				JSONObject json = new JSONObject();
+				json.put( "trial", nWalker.getTrial() );
+				JSONArray dz= new JSONArray( nWalker.getTimeSeries() );
+				json.put( "DataZ", dz );
+				
+				data.add( json.toString() );
+			}
+			
+		}finally {
+			
+			pm.close();
+		}
+		
+		return data;
+	}
+	public int getNumberOfTrials() {
+		
+		int count;
+		
+		PersistenceManager pm = getPersistenceManager();
+		
+		try{
+		
+			//Query all of the Walker objects on the server
+			Query q= pm.newQuery( Walker.class );
+			
+			@SuppressWarnings("unchecked")
+			List<Walker> walkCollections = (List<Walker>) q.execute();
+			
+			//Find the number of walks on the server
+			count= walkCollections.size();
+		
+		}finally{
+			
+			pm.close();
+		}
+		
+		return count;
 	}
 	
 	/**

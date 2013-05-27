@@ -14,6 +14,9 @@ public interface GreetingServiceAsync {
 	void getList( AsyncCallback<String[]> callback )
 			throws IllegalArgumentException;
 	
-	void getData( String input, AsyncCallback <ArrayList<Float> > callback )
+	void getData( String trial, AsyncCallback <ArrayList<Float>> callback )
+			throws IllegalArgumentException;
+	
+	void getData( AsyncCallback <ArrayList<String>> callback )
 			throws IllegalArgumentException;
 }

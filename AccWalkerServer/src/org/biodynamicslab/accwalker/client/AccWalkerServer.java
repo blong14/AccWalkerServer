@@ -4,9 +4,15 @@ import java.util.ArrayList;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.visualization.client.AbstractDataTable;
@@ -45,27 +51,37 @@ public class AccWalkerServer implements EntryPoint {
 	/**The list item service to talk to the server*/
 	private GreetingServiceAsync greetSvc = GWT.create( GreetingService.class );
 	
-	/**Variable used to determine if a trial was deleted from the server or not*/
-	private boolean deleted;
-	
+	/**The main panel to had UI components*/
 	private VerticalPanel mainPanel;
 	
-	private ArrayList<Float> trialData= new ArrayList<Float>();
+	/**Popup panel to tell user that data is being loaded*/
+	private PopupPanel loadPanel;
 	  
 	/**
 	 * Entry point method.
 	 */
 	public void onModuleLoad() {
-		
+	
 	    //Set up view layout
 	    mainPanel = new VerticalPanel();
-	    RootPanel.get( "rootPanel" ).add( mainPanel );
-	    
-	    mainPanel.add( setUpMenuBar() );
 
-		getTrialNames();
+	    //Make a call to the server to retrieve the data
+	    getData();
+	    
+	    //Display the loadPanel while data is being retreived from the server
+	    loadPanel= new PopupPanel();
+	    loadPanel.setWidget(new Label( "Please be patient while trial data is loaded from server" ) );
+	    loadPanel.setGlassEnabled(true);
+	    mainPanel.add( loadPanel );
+	    
+		RootPanel.get( "rootPanel" ).add( mainPanel );
 	}
 	 
+	/**
+	 * The setUpMenuBar method handles create menu items
+	 * 
+	 * @return a HorizontalPanel with menu items associated with it
+	 */
 	private HorizontalPanel setUpMenuBar() {
 	
 		//Create about menu item
@@ -77,13 +93,15 @@ public class AccWalkerServer implements EntryPoint {
 	    });
 	    menuBar.setStyleName( "gwt-MenuBar" );
 	    menuBar.addItem( mntmAbout );
-	  
+	 
+	    //Add the plot item
 	    menuBar.addItem( "Plot", Plot );
 	    
 	    //Add analyze menu item
 	    mntmAnalyze = new MenuItem( "Analyze Data", false, new Command(){
 	    	@Override
 	    	public void execute(){
+	    		
 	    		Window.alert( "Coming Soon!" );
 	    	}
 	    });
@@ -118,162 +136,109 @@ public class AccWalkerServer implements EntryPoint {
 		
 		return mData;
 	}
-		
+	
 	/**
 	 * The addPlotMenuItem method handles adding trials to the plotting menu options
 	 * 
 	 * @param trial The trial to plot and to be added to the plot menu
 	 * @return The MenuItem to add to the plot menu
 	 */
-	private MenuItem addPlotMenuItem( final String trial ){
-		
+	private MenuItem addPlotMenuItem( final String trial, final ArrayList<Float> dataToPlot ){
+
 		MenuItem mItem= new MenuItem( trial, false, new Command(){
-			
+
 			@Override
 			public void execute(){
-				
-				getData( trial );
-				
+
 				Runnable onLoadCallback= new Runnable() {
-					
+
+					//The data chart to plot data
 					private LineChart dataChart;
-					
+
 					public void run() {
-						
+
 						//Create the DataTable
-						AbstractDataTable data = createTable( trialData );
-						
+						AbstractDataTable data = createTable( dataToPlot );
+
 						Options options = Options.create();
 						options.setGridlineColor( "white" );
 						options.setColors( "red" );
 						options.setLegend( "none" );
 						options.setWidth(800);
 						options.setHeight(480);
-			              
+
 						//Now, plot the data
 						dataChart = new LineChart( data, options );
-						
+
+						//Check to see if a plot is currently visible
+						//If it is, remove it
 						if( plotPanel.isVisible() )
 							plotPanel.clear(); RootPanel.get( "plotPanel" ).clear();
-						
+
+						//Now add the new chart to the plot panel
 						plotPanel.add( dataChart );
 						RootPanel.get( "plotPanel" ).add( plotPanel );
 					}
 				};
-				
+
 				VisualizationUtils.loadVisualizationApi( onLoadCallback, LineChart.PACKAGE );
 			}
 		});
-		
+
 		return mItem;
 	}
 	
-	/**
-	 * The getTrialNames method retrieves the list of trial names off the server
-	 */
-	private void getTrialNames(){
-		
-		// Initialize the service proxy.
-		if ( greetSvc == null )
-			greetSvc = GWT.create( GreetingService.class );
-
-		// Set up the callback objects
-		AsyncCallback<String[]> callback = new AsyncCallback<String[]>() {
-
-			//Handle server communication error
-			public void onFailure(Throwable caught) {
-
-				Window.alert( "Server Error: " + caught.toString() );
-			}
-
-			//Success!
-			public void onSuccess( String[] result ) {
-
-				//An array of trial names has been returned from the server
-				for( int i= 0; i < result.length; i++ ){
-
-					//Now move through this array adding the trial names to the list
-					Plot.addItem( addPlotMenuItem( result[i] ) );
-				}
-			}
-		};
-
-		// Make the call to the server
-		greetSvc.getList( callback );
-	}
-	
-  /**
-   * The getData method handles retrieving the data associated with a trial
+ /**
+   * The getData method handles retrieving the data from the server
    * 
-   * @param trial The trial to get data from
    */
-	private void getData( String trial ) {
-	  
+	private void getData() {
+
 		// Initialize the service proxy.
 		if ( greetSvc == null )
 			greetSvc = GWT.create( GreetingService.class );
-		
-		// Set up the callback objects
-		AsyncCallback<ArrayList<Float>> callback = new AsyncCallback<ArrayList<Float>>() {
+
+		// Set up the callback object
+		AsyncCallback<ArrayList<String>> callback = new AsyncCallback<ArrayList<String>>() {
     
 		  //Handle server communication error
 		  public void onFailure(Throwable caught) {
-			  //TODO: Handle Server Error in getData method
+			  
+			  Window.alert( "Server communication error: " + caught.getMessage() );
 		  }
 
 		  //Success! 
-		  public void onSuccess( final ArrayList<Float> result ) {
-			   				  
-			  if( !trialData.isEmpty() )
-				  trialData.clear();
-			  
-			  if( result == null ){
-				  Window.alert( "No data to plot" );
-				  return;
+		  public void onSuccess( final ArrayList<String> result ) {
+
+			  //Move through the result array and parse JSON data
+			  for( int i= 0; i < result.size(); i++ ) {
+				  
+				  //Parse JSON data now
+				  JSONValue value= JSONParser.parseStrict( result.get(i) );
+				  JSONObject jObject = value.isObject();
+				  String trial= jObject.get("trial").isString().stringValue();
+				  JSONArray data= jObject.get("DataZ").isArray();
+				  
+				  double number;
+				  ArrayList<Float> mData= new ArrayList<Float>();
+				  for( int j= 0; j < data.size(); j++ ) {
+					  
+					  number= data.get(j).isNumber().doubleValue();
+					  mData.add( (float)number );
+				  }
+
+				  //Add the trial and data to plot to the plot menu item
+				  Plot.addItem( addPlotMenuItem( trial, mData ) );
 			  }
-			  			  
-		      for(int i= 0; i < result.size(); i++){
-		    	  
-		    	  trialData.add( result.get(i) );
-		      }
+			  
+			 //Data parsing is complete so remove the loadPanel and show the menu for the user
+			 mainPanel.remove( loadPanel );
+			 mainPanel.add( setUpMenuBar() );
 		  }
 	  };
-	  
+
 	  // Make the call to the server
-	  greetSvc.getData( trial, callback );
-	}
+	  greetSvc.getData( callback );
 	
-	/**
-	 * The removeItem method handles removing trials from the server 
-	 * 
-	 * @param trial The trial to remove from the list
-	 */
-	@SuppressWarnings("rawtypes")
-	public boolean removeFromServer( String trial ){
-
-		// Initialize the service proxy.
-		if ( greetSvc == null )
-			greetSvc = GWT.create( GreetingService.class );
-
-		// Set up the callback objects
-		AsyncCallback callback = new AsyncCallback() {
-	 
-			public void onFailure(Throwable caught) {
-		
-				//Server error, data was not deleted
-				deleted= false;
-			}
-
-			public void onSuccess( Object result ) {
-		
-				//Alert user that the trail has been deleted
-				deleted= true;
-			}
-		};
-
-		// Make the call to the server.
-		greetSvc.removeFromList( trial, callback );
-		
-		return deleted;
 	}
 }

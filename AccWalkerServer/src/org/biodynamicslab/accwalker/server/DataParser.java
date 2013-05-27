@@ -2,6 +2,7 @@ package org.biodynamicslab.accwalker.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
@@ -88,6 +89,11 @@ public class DataParser extends HttpServlet {
 		Gson gson= new Gson();
 		Walker mWalker= gson.fromJson( data, Walker.class );
 		
+		//Now differentiate the data set
+		ArrayList<Integer> diffData= DataAnalysis.findPeaks( mWalker.getDataZ(), 4, 1 );
+	
+		mWalker.setTimeSeries( diffData );
+
 		//Now that data is decoded, we can push the persistent manager to handle storing the data
 		//as a Walker object on the server
 		PersistenceManager pm= getPersistenceManager();

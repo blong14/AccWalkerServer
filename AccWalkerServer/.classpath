@@ -6,13 +6,15 @@
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/google-gson-2.2.3-release/google-gson-2.2.3/gson-2.2.3.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-agent.jar" sourcepath="war/WEB-INF/lib/appengine-agent.jar"/>
-	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900/junit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900/junit.jar" sourcepath="C:/Users/longbe/Desktop/eclipse/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900/junit.jar"/>
 	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.8.0/appengine-java-sdk-1.8.0/lib/testing/appengine-testing.jar"/>
 	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.8.0/appengine-java-sdk-1.8.0/lib/agent/appengine-agent.jar"/>
 	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.8.0/appengine-java-sdk-1.8.0/lib/impl/appengine-api-stubs.jar"/>
 	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.8.0/appengine-java-sdk-1.8.0/lib/impl/appengine-api.jar"/>
 	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/gwt-visualization-1.1.2/gwt-visualization-1.1.2/gwt-visualization.jar"/>
 	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/jdo2-api-2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/com.google.gwt.eclipse.sdkbundle_2.5.1/gwt-2.5.1/gwt-servlet-deps.jar"/>
+	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/commons-math3-3.2-bin/commons-math3-3.2/commons-math3-3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/longbe/Desktop/eclipse/plugins/commons-math3-3.2-bin/commons-math3-3.2/commons-math3-3.2-sources.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

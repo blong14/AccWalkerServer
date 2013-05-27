@@ -25,6 +25,10 @@ public class Walker {
 	@Persistent( valueStrategy = IdGeneratorStrategy.IDENTITY )
 	private Long id;
 	
+	/**User info*/
+	@Persistent
+	private String user;
+	
 	/**The trial description*/
 	@Persistent
 	private String trial;
@@ -37,6 +41,10 @@ public class Walker {
 	@Persistent
 	private ArrayList<Float> DataZ;
 	
+	/**The differentiated data set*/
+	@Persistent
+	private ArrayList<Integer> diffData;
+	
 	/**
 	 * Walker constructor 
 	 * 
@@ -44,8 +52,9 @@ public class Walker {
 	 * @param time of data collection
 	 * @param DataZ the data collected
 	 */
-	public Walker( String trial, int time, ArrayList<Float> DataZ ){
+	public Walker( String trial, String user, int time, ArrayList<Float> DataZ ){
 		
+		this.user= user;
 		this.trial= trial;
 		this.time= time;
 		this.DataZ= DataZ;
@@ -58,6 +67,15 @@ public class Walker {
 	 */
 	public Long getId() {
 		return id;
+	}
+	
+	/**
+	 * The getEmail method returns the email address of the user who posted the data
+	 * 
+	 * @return The email of the user who posted the data
+	 */
+	public String getEmail() {
+		return user;
 	}
 
 	/**
@@ -86,6 +104,19 @@ public class Walker {
 	public ArrayList<Float> getDataZ(){
 		return DataZ;
 	}
+	
+	/**
+	 * The getTimeSeries method returns the differentiated data
+	 * 
+	 * @return The differentiated data set
+	 */
+	public ArrayList<Integer> getTimeSeries() {
+		
+		if( diffData == null )
+			throw new NullPointerException();
+		else
+			return diffData;
+	}
 
 	/**
 	 * The setTrial method handles setting trial information 
@@ -94,5 +125,14 @@ public class Walker {
 	 */
 	public void setTrial(String trial) {
 		this.trial = trial;
+	}
+	
+	/**
+	 * The setTimeSeries method sets the differentiated time series of the data
+	 * 
+	 * @param The differentiated data set
+	 */
+	public void setTimeSeries( ArrayList<Integer> data ) {
+		this.diffData= data;
 	}
 }
