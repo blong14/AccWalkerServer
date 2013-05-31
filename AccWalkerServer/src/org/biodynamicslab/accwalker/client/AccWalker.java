@@ -42,6 +42,8 @@ public class AccWalker implements EntryPoint {
 	/**The plot menu bar to plot the data for a trial*/
 	private final MenuBar Plot = new MenuBar( true );
 
+	private final MenuBar rawPlot= new MenuBar( true );
+
 	/**About menu item*/
 	private MenuItem mntmAbout;
 
@@ -53,6 +55,8 @@ public class AccWalker implements EntryPoint {
 
 	/**Popup panel to tell user that data is being loaded*/
 	private PopupPanel loadPanel;
+
+	private PopupPanel dataPanel= new PopupPanel();
 
 	/**
 	 * Entry point method.
@@ -91,15 +95,8 @@ public class AccWalker implements EntryPoint {
 		menuBar.setStyleName( "gwt-MenuBar" );
 		menuBar.addItem( mntmAbout );
 
-		//Add the raw plot button
-		MenuItem mntmRaw= new MenuItem( "Plot Raw", false, new Command() {
-			@Override
-			public void execute() {
-				Window.alert( "Coming soon" );
-			}
-		});
-		menuBar.addItem( mntmRaw );
-		
+		menuBar.addItem( "Plot Raw", rawPlot );
+
 		//Add the plot item
 		menuBar.addItem( "Analyze Data", Plot );
 
@@ -140,8 +137,9 @@ public class AccWalker implements EntryPoint {
 					String trial= jObject.get("trial").isString().stringValue();
 					//String sampE= jObject.get("sampleEntropy").isString().stringValue();
 					//String dfaAlpha= jObject.get("dfaAlpha").isString().stringValue();
-					//String cv= jObject.get("CV").isString().stringValue();
+					double cv= jObject.get("CV").isNumber().doubleValue();
 					JSONArray data= jObject.get("DataZ").isArray();
+					JSONArray rawData= jObject.get("Raw").isArray();
 
 					double number;
 					ArrayList<Float> mData= new ArrayList<Float>();
@@ -151,8 +149,17 @@ public class AccWalker implements EntryPoint {
 						mData.add( (float)number );
 					}
 
+					double rawNum;
+					ArrayList<Float> rawDat= new ArrayList<Float>();
+					for( int k= 0; k < rawData.size(); k++ ) {
+
+						rawNum= rawData.get(k).isNumber().doubleValue();
+						rawDat.add( (float)rawNum );
+					}
+
 					//Add the trial and data to plot to the plot menu item
-					Plot.addItem( addPlotMenuItem( trial, mData ) );
+					Plot.addItem( addPlotMenuItem( trial, mData, cv ) );
+					rawPlot.addItem( addRawPlotMenuItem( trial, rawDat ) );
 				}
 
 				//Data parsing is complete so remove the loadPanel and show the menu for the user
@@ -172,7 +179,7 @@ public class AccWalker implements EntryPoint {
 	 * @param trial The trial to plot and to be added to the plot menu
 	 * @return The MenuItem to add to the plot menu
 	 */
-	private MenuItem addPlotMenuItem( final String trial, final ArrayList<Float> dataToPlot ){
+	private MenuItem addPlotMenuItem( final String trial, final ArrayList<Float> dataToPlot, final double cv ){
 
 		MenuItem mItem= new MenuItem( trial, false, new Command(){
 
@@ -207,6 +214,9 @@ public class AccWalker implements EntryPoint {
 							//Now add the new chart to the plot panel
 							plotPanel.add( dataChart );
 							RootPanel.get( "plotPanel" ).add( plotPanel );
+							dataPanel.setWidget( new Label( "Coefficient of Variation: " + Math.round( cv ) + "%" ) );
+							dataPanel.setGlassEnabled(true);
+							RootPanel.get( "dataPanel" ).add( dataPanel );
 					}
 				};
 
@@ -216,7 +226,55 @@ public class AccWalker implements EntryPoint {
 
 		return mItem;
 	}
-	
+
+	private MenuItem addRawPlotMenuItem( final String trial, final ArrayList<Float> dataToPlot ){
+
+		MenuItem mItem= new MenuItem( trial, false, new Command(){
+
+			@Override
+			public void execute(){
+
+				Runnable onLoadCallback= new Runnable() {
+
+					//The data chart to plot data
+					private LineChart dataChart;
+
+					public void run() {
+
+						//Create the DataTable
+						AbstractDataTable data = createTable( dataToPlot );
+
+						Options options = Options.create();
+						options.setGridlineColor( "white" );
+						options.setColors( "red" );
+						options.setLegend( "none" );
+						options.setWidth(800);
+						options.setHeight(480);
+
+						//Now, plot the data
+						dataChart = new LineChart( data, options );
+
+						//Check to see if a plot is currently visible
+						//If it is, remove it
+						if( plotPanel.isVisible() )
+							plotPanel.clear(); RootPanel.get( "plotPanel" ).clear();
+
+							//Now add the new chart to the plot panel
+							plotPanel.add( dataChart );
+							RootPanel.get( "plotPanel" ).add( plotPanel );
+							
+						if( dataPanel.isVisible() )
+							dataPanel.clear(); RootPanel.get( "dataPanel" ).clear();
+					}
+				};
+
+				VisualizationUtils.loadVisualizationApi( onLoadCallback, LineChart.PACKAGE );
+			}
+		});
+
+		return mItem;
+	}
+
 	/**
 	 * Populate the data table with data
 	 * 

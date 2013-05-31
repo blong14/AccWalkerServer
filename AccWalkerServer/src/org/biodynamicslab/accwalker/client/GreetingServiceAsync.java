@@ -19,4 +19,7 @@ public interface GreetingServiceAsync {
 
 	void getData( AsyncCallback <ArrayList<String>> callback )
 			throws IllegalArgumentException;
+	
+	void getRawData( AsyncCallback <ArrayList<String>> callback )
+			throws IllegalArgumentException;
 }

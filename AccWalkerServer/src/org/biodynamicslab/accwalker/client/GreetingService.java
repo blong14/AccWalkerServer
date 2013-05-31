@@ -18,4 +18,6 @@ public interface GreetingService extends RemoteService {
 	ArrayList<Float> getData( String trial );
 
 	ArrayList<String> getData() throws Exception;
+	
+	ArrayList<String> getRawData() throws Exception;
 }

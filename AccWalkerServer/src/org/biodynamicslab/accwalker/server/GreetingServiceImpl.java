@@ -160,6 +160,44 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 				json.put( "trial", nWalker.getTrial() );
 				json.put( "email", nWalker.getEmail() );
 				JSONArray dz= new JSONArray( nWalker.getTimeSeries() );
+				JSONArray rawD= new JSONArray( nWalker.getDataZ() );
+				json.put( "Raw", rawD );
+				json.put( "DataZ", dz );
+				json.put( "sampleEntropy", nWalker.getSampEntrpy() );
+				json.put( "dfaAlpha", nWalker.getDfaAlpha() );
+				json.put( "CV", nWalker.getCv() );
+				
+				data.add( json.toString() );
+			}
+			
+		}finally {
+			
+			pm.close();
+		}
+		
+		return data;
+	}
+	
+	public ArrayList<String> getRawData() throws Exception {
+		
+		java.util.ArrayList<String> data= new ArrayList<String>();
+		
+		PersistenceManager pm= getPersistenceManager();
+		
+		try {
+			
+			//Query all of the Walker objects on the server
+			Query q = pm.newQuery( Walker.class );
+			
+			@SuppressWarnings("unchecked")
+			List<Walker> mWalkers = ( List<Walker> ) q.execute();
+			
+			for ( Walker nWalker : mWalkers ) {
+				
+				JSONObject json = new JSONObject();
+				json.put( "trial", nWalker.getTrial() );
+				json.put( "email", nWalker.getEmail() );
+				JSONArray dz= new JSONArray( nWalker.getDataZ() );
 				json.put( "DataZ", dz );
 				json.put( "sampleEntropy", nWalker.getSampEntrpy() );
 				json.put( "dfaAlpha", nWalker.getDfaAlpha() );
