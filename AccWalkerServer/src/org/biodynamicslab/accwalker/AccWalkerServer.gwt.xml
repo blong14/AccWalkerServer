@@ -21,7 +21,7 @@
 	<inherits name='com.google.gwt.visualization.Visualization' />
 	<inherits name='com.google.gwt.json.JSON' />
 	<!-- Specify the app entry point class.                         -->
-	<entry-point class="org.biodynamicslab.accwalker.client.AccWalkerServer"/>
+	<entry-point class="org.biodynamicslab.accwalker.client.AccWalker"/>
 	<!-- Specify the paths for translatable code                    -->
 	<source path='client' />
 	<source path='shared' />

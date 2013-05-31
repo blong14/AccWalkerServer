@@ -10,12 +10,12 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("greet")
 public interface GreetingService extends RemoteService {
-	
+
 	void removeFromList( String trial );
-	  
+
 	String[] getList();
-	
+
 	ArrayList<Float> getData( String trial );
-	
+
 	ArrayList<String> getData() throws Exception;
 }

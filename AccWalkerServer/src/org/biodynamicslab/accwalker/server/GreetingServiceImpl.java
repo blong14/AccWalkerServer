@@ -158,8 +158,12 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 				
 				JSONObject json = new JSONObject();
 				json.put( "trial", nWalker.getTrial() );
+				json.put( "email", nWalker.getEmail() );
 				JSONArray dz= new JSONArray( nWalker.getTimeSeries() );
 				json.put( "DataZ", dz );
+				json.put( "sampleEntropy", nWalker.getSampEntrpy() );
+				json.put( "dfaAlpha", nWalker.getDfaAlpha() );
+				json.put( "CV", nWalker.getCv() );
 				
 				data.add( json.toString() );
 			}
@@ -171,6 +175,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		
 		return data;
 	}
+	
 	public int getNumberOfTrials() {
 		
 		int count;
