@@ -1,1 +1,16 @@
-/test-classes
+# Ignore class files and packages #
+*.class
+*.jar
+
+# Ignore gwt unit caches
+gwt-unitCache/
+
+# boilerplate generated classes #
+.apt_generated/
+
+# deploy caches #
+war/WEB-INF/deploy/
+war/WEB-INF/classes/
+
+# Generated html files #
+*.cache.html
