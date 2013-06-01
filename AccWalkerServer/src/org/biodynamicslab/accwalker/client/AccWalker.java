@@ -42,6 +42,7 @@ public class AccWalker implements EntryPoint {
 	/**The plot menu bar to plot the data for a trial*/
 	private final MenuBar Plot = new MenuBar( true );
 
+	/**The raw plot menu bar to plot raw data*/
 	private final MenuBar rawPlot= new MenuBar( true );
 
 	/**About menu item*/
@@ -56,6 +57,7 @@ public class AccWalker implements EntryPoint {
 	/**Popup panel to tell user that data is being loaded*/
 	private PopupPanel loadPanel;
 
+	/**Popup panel to display process data*/
 	private PopupPanel dataPanel= new PopupPanel();
 
 	/**
@@ -227,6 +229,12 @@ public class AccWalker implements EntryPoint {
 		return mItem;
 	}
 
+	/**
+	 * The addRawPlotMenuItem method handles adding trials to the raw plotting menu options
+	 * 
+	 * @param trial The trial to plot and to be added to the plot menu
+	 * @return The MenuItem to add to the plot menu
+	 */	
 	private MenuItem addRawPlotMenuItem( final String trial, final ArrayList<Float> dataToPlot ){
 
 		MenuItem mItem= new MenuItem( trial, false, new Command(){
@@ -262,9 +270,9 @@ public class AccWalker implements EntryPoint {
 							//Now add the new chart to the plot panel
 							plotPanel.add( dataChart );
 							RootPanel.get( "plotPanel" ).add( plotPanel );
-							
-						if( dataPanel.isVisible() )
-							dataPanel.clear(); RootPanel.get( "dataPanel" ).clear();
+
+							if( dataPanel.isVisible() )
+								dataPanel.clear(); RootPanel.get( "dataPanel" ).clear();
 					}
 				};
 
