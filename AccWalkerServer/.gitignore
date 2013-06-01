@@ -1,6 +1,7 @@
 # Ignore class files and packages #
 *.class
 *.jar
+!war/WEB-INF/lib/*.jar
 
 # Ignore gwt unit caches
 gwt-unitCache/
@@ -9,7 +10,6 @@ gwt-unitCache/
 war/WEB-INF/appengine-generated
 war/WEB-INF/deploy/
 war/WEB-INF/classes/
-war/WEB-INF/lib/
 
 # Generated html files and other cache files #
 *.cache.html
