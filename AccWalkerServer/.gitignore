@@ -5,12 +5,16 @@
 # Ignore gwt unit caches
 gwt-unitCache/
 
-# boilerplate generated classes #
-.apt_generated/
-
 # deploy caches #
+war/WEB-INF/appengine-generated
 war/WEB-INF/deploy/
 war/WEB-INF/classes/
+war/WEB-INF/lib/
 
-# Generated html files #
+# Generated html files and other cache files #
 *.cache.html
+*.gwt.rpc
+*.cache.png
+*.nocache.js
+*.cache.gif
+hosted.html
