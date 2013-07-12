@@ -19,6 +19,7 @@ import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.gwt.user.client.ui.MenuBar;
@@ -204,6 +205,12 @@ public class AccWalker implements EntryPoint {
 						options.setLegend( "none" );
 						options.setWidth(800);
 						options.setHeight(480);
+						
+						AxisOptions aOptions= AxisOptions.create();
+						aOptions.setMaxValue(200);
+						aOptions.setMinValue(0);
+						
+						options.setVAxisOptions(aOptions);
 
 						//Now, plot the data
 						dataChart = new LineChart( data, options );
@@ -258,6 +265,12 @@ public class AccWalker implements EntryPoint {
 						options.setLegend( "none" );
 						options.setWidth(800);
 						options.setHeight(480);
+						
+						AxisOptions aOptions= AxisOptions.create();
+						aOptions.setMaxValue(20);
+						aOptions.setMinValue(-20);
+						
+						options.setVAxisOptions(aOptions);
 
 						//Now, plot the data
 						dataChart = new LineChart( data, options );
