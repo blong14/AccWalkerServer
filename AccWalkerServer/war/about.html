@@ -1,64 +1,119 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-
+<!doctype html>
+<html>
 <head>
-
-
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-
-<title>About AccWalker</title>
-
-
-<link href="/stylesheets/about.css" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Average+Sans' rel='stylesheet' type='text/css'>
-
-
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AccWalker | about</title>
+<link rel="stylesheet" type="text/css"
+	href="./stylesheets/mobile-about.css" />
+<link rel="stylesheet" type="text/css"
+	href="./stylesheets/bootstrap.css" />
+<link rel="stylesheet" type="text/css"
+	href="./stylesheets/bootstrap-responsive.css" />
+<link rel="stylesheet" type="text/css"
+	href="./stylesheets/bootstrap-min.css" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript"
+	src="accwalkerserver/accwalkerserver.nocache.js"></script>
+<script type="text/javascript" src="./js/bootstrap.js"></script>
+<script type="text/javascript" src="./js/bootstrap.min.js"></script>
 </head>
 <body>
+	<div class="nav">
+		<ul class="nav nav-pills">
+			<li><a href="index.html"><i class="icon-home"></i>Home</a></li>
+		</ul>
+	</div>
+	<!-- navigation -->
 
-<div class="header"><div class="header-content"><a href="http://www.accwalkermobile.appspot.com/">AccWalker Web App</a></div></div>
+	<div class="container">
 
-<br />
-<div class="content"><h1>What is AccWalker?</h1>
+		<div class="row">
+			<div class="span12">
+				<h2>What is AccWalker?</h2>
+				<p>AccWalker is a joint project between faculty at Winston Salem
+					State University, East Carolina University and University of North
+					Carolina at Greensboro. AccWalker is an application designed to
+					perform complex biomechanical data collections and analyses using
+					mobile handsets. AccWalker uses tri-axial acceleration data
+					collected as the user moves around his or her environment. The data
+					is saved and sent to a server, where a researcher can use a
+					web-based interface containing a data-analysis toolkit to perform
+					non-linear dynamical analyses.</p>
+			</div>
+			<div class="span12">
+				<h4>The 'Plot Raw' button</h4>
+				<p>Selecting raw data on the app homepage will display the raw
+					acceleration data from a particular trial. This is the acceleration
+					data in the anterior direction collected from the device.</p>
+			</div>
+			<div class="span12">
+				<h4>The 'Analyze Data' button</h4>
+				<p>Selecting analyzed data on the app homepage will display the
+					processed data from a particular trial. This data represents a
+					differentiated time series of the peak-to-peak acceleration data
+					and will display the coefficient of variation for the time series.</p>
+			</div>
+			<div class="span12">
+				<h4>What is Non-Linear Analysis?</h4>
+				<p>Ask Chris!</p>
+			</div>
+		</div>
 
-<br />
-<p>AccWalker is a joint project between faculty at Winston Salem State University, East Carolina University and University of North Carolina at Greensboro. AccWalker is an application designed to perform complex biomechanical data collections and analyses using mobile handsets. AccWalker uses tri-axial acceleration data collected as the user moves around his or her environment. The data is saved and sent to a server, where a researcher can use a web-based interface containing a data-analysis toolkit to perform non-linear dynamical analyses. </p>
+		<div class="row">
+			<div class="span12">
+				<h2>Meet the ACCWalker Team</h2>
+			</div>
+		</div>
 
-<br />
-<h2>What is Non-Linear Dynamical Analysis?</h2>
-<br />
-<p>Ask Chris!</p>
+		<div class="row-fluid">
 
-<br />
-<h2>The 'Plot Raw' button</h2>
-<br />
-<p>Selecting raw data on the app homepage will display the raw acceleration data from a particular trial. This is the acceleration data in the anterior direction collected from the device.</p>
+			<div id="pic">
+				<div class="row-fluid">
+					<div class="span6">
+						<img src="./images/ben-long.jpg">
+					</div>
+					<div class="span6">
+						<p>Ben Long</p>
+						<p>Ben is a Biomechanist at WSSU. He likes UT football and
+							computer science.</p>
+					</div>
+				</div>
+			</div>
+			<div id="pic">
+				<div class="row-fluid">
+					<div class="span6">
+						<img src="./images/patrick-rider.png">
+					</div>
+					<div class="span6">
+						<p>Patrick Rider</p>
+						<p>Ben is a Biomechanist at WSSU. He likes UT football and
+							computer science.</p>
+					</div>
+				</div>
 
-<br />
-<h2>The 'Analyze Data' button</h2>
-<br />
-<p>Selecting analyzed data on the app homepage will display the processed data from a particular trial. This data represents a differentiated time series of the peak-to-peak acceleration data and will display the coefficient of variation for the time series.</p>
-<br />
-</div>
-<div class="teamContent"><p><h1>Meet the ACCWalker Team</h1></p>
-</div>
+			</div>
+			<div id="pic">
+				<div class="row-fluid">
+					<div class="span6">
+						<img src="./images/chris-rhea.jpg">
+					</div>
+					<div class="span6">
+						<div id="textBox">
+							<p>Chris Rhea</p>
+							<p>Chris is a Biomechanist at UNCG. He has the non-linear
+								dynamical analysis game on lock.</p>
+						</div>
 
-<div id="pic"><img src="/images/ben-long.jpg" /><p>Ben Long </p><div class="textBox">Ben is a Biomechanist at WSSU. He likes UT football, science and computer programming.</div></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-<div id="pic"><img src="/images/patrick-rider.png" /><p>Patrick Rider</p><div class="textBox">Patrick is a Biomechanist at ECU. He likes being a dad and the Oakland Raiders. He also dabbles in web design and software engineering.</div></div>
-
-<div id="pic"><img src="/images/chris-rhea.jpg"><p>Chris Rhea</p><div class="textBox">Chris is a Biomechanist at UNCG. He has the non-linear dynamical analysis game on lock.</div></div>
-
-</div>
-<div class="content"></div>
-
+	<!-- container -->
 </body>
-
-
 </html>
 
 

@@ -75,7 +75,6 @@ public class AccWalker implements EntryPoint {
 		//Display the loadPanel while data is being retreived from the server
 		loadPanel= new PopupPanel();
 		loadPanel.setWidget(new Label( "Please be patient while trial data is loaded from server" ) );
-		loadPanel.setGlassEnabled(true);
 		mainPanel.add( loadPanel );
 
 		RootPanel.get( "rootPanel" ).add( mainPanel );
@@ -95,7 +94,8 @@ public class AccWalker implements EntryPoint {
 				Window.open( "/about.html", "_self", ""); 
 			}
 		});
-		menuBar.setStyleName( "gwt-MenuBar" );
+		menuBar.setStyleName( "nav nav-pills" );
+		//menuBar.setStyleName( "gwt-MenuBar" );
 		menuBar.addItem( mntmAbout );
 
 		menuBar.addItem( "Plot Raw", rawPlot );
