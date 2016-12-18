@@ -1,4 +1,4 @@
-AccWalkerServer
+Walker
 ===============
 
 Server Side Learning Project
